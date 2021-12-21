@@ -10,8 +10,53 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from cmdmaker import Cmdmaker
+
+classes = {
+    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+    'State': State, 'City': City, 'Amenity': Amenity,
+    'Review': Review
+}
+
+pat = {
+    "identifier": r"[a-zA-Z_][a-zA-Z0-9_]*",
+    "float_p": r"[+-]?\d+\.\d+",
+    "integer": r"[+-]?\d+",
+    "string": r"\"[^\"]*\"",
+    "equal": r"=",
+    "ignore": r"\s+"
+}
+
+maker = Cmdmaker(pat)
 
 
+@maker.match
+def integer(token):
+    return int(token)
+
+@maker.match
+def string(token):
+    return token[1:-1].replace("_", " ")
+
+@maker.match
+def float_p(token):
+    return float(token)
+
+
+@maker.cmd("identifier r<identifier equal m|integer float_p string|>")
+def create(class_name, args):
+    """ Create an object of any class
+     eg  (hbnb) create Place id=1 name="Holberton")"""
+    args = {arg: value for arg, _, value in args}
+    if class_name not in classes:
+        print(f"** class {class_name} doesn't exist **")
+    else:
+        new_instance = classes[class_name](**args)
+        storage.new(new_instance)
+        print(new_instance.id)
+        storage.save()
+
+@maker.infect
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
 
@@ -58,23 +103,10 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
-
-    def help_create(self):
-        """ Help information for the create method """
-        print("Creates a class of any type")
-        print("[Usage]: create <className>\n")
+    # def help_create(self):
+    #     """ Help information for the create method """
+    #     print("Creates a class of any type")
+    #     print("[Usage]: create <className>\n")
 
     def do_show(self, args):
         """ Method to show an individual object """
