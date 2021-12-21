@@ -20,11 +20,14 @@ classes = {
 
 class FileStorage:
     """This class manages storage of hbnb models in JSON format"""
-    __file_path = 'file.json'
-    __objects = {}
+    __file_path: str = 'file.json'
+    __objects: Dict[str, BaseModel] = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
+        if cls and cls in classes:
+            return {k: v for k, v in FileStorage.__objects
+                    if v.__class__.__name__ == cls}
         return FileStorage.__objects
 
     def new(self, obj):
@@ -49,3 +52,9 @@ class FileStorage:
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj: BaseModel = None) -> None:
+        """Deletes obj from Basemodel if it exists"""
+        if not obj:
+            return
+        del self.all()[obj.id]
