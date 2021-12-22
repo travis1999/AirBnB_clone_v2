@@ -24,7 +24,7 @@ class BaseModel:
             *args (any): Unused.
             **kwargs (dict): Key/value pairs of attributes.
         """
-        self.id = str(uuid4())
+        self.id = str(uuid.uuid4())
         self.created_at = self.updated_at = datetime.utcnow()
 
         if kwargs:
@@ -66,5 +66,6 @@ class BaseModel:
 
     def __str__(self):
         """Return the print/str representation of the BaseModel instance."""
+        d = self.__dict__.copy()
         d.pop("_sa_instance_state", None)
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+        return f"[{self.__class__.__name__}] ({self.id}) {d}"

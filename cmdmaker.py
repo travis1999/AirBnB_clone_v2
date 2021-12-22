@@ -278,6 +278,7 @@ class Cmdmaker:
             def do_cmd(me, arg):
                 arg = f"{cmd.function.__name__} {arg}"
                 return self.run_cmd(arg)
+
             do_cmd.__name__ = f"do_{cmd.function.__name__}"
             do_cmd.__doc__ = cmd.function.__doc__
             setattr(_class, do_cmd.__name__, do_cmd)

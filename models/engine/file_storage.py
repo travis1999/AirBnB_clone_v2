@@ -32,7 +32,7 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.all().update({obj.id: obj})
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -57,4 +57,4 @@ class FileStorage:
         """Deletes obj from Basemodel if it exists"""
         if not obj:
             return
-        del self.all()[obj.id]
+        del self.__objects[obj.id]
